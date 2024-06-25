@@ -1,0 +1,61 @@
+<!DOCTYPE html>  
+<html lang="zh-CN">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>居中显示古诗</title>  
+    <style>  
+        body, html {  
+            height: 100%;  
+            margin: 0;  
+            display: flex;  
+            justify-content: center;  
+            align-items: center;  
+            background-color: #f5f5f5; /* 可选：为页面设置背景色 */  
+            font-family: 'NSimSun', 'SimSun', serif; /* 推荐使用中文字体 */  
+        }  
+  
+        .poem-container {  
+            display: flex;  
+            flex-direction: column;  
+            align-items: center;  
+            justify-content: center;  
+            text-align: right; /* 使文字从右向左排列 */  
+            writing-mode: vertical-rl; /* 垂直从右到左 */  
+        }  
+  
+        .poem-title {  
+            font-size: 24px;  
+            margin-bottom: 20px; /* 标题与作者之间的间距 */  
+        }  
+  
+        .poem-author {  
+            font-size: 18px;  
+        }  
+  
+        .poem {  
+            text-align: center; /* 诗句本身水平居中 */  
+            margin-top: 20px; /* 标题与诗句之间的间距 */  
+            font-size: 20px;  
+        }  
+    </style>  
+</head>  
+<body>  
+    <div class="poem-container">  
+        <div class="poem-title">饮酒·其五</div>  
+        <div class="poem-author">陶渊明</div>  
+    </div>  
+    <div class="poem">
+        <p>结庐在人境，</p>  
+        <p>而无车马喧。</p>  
+        <p>问君何能尔，</p>  
+        <p>心远地自偏。</p> 
+        <p>采菊东篱下，</p>  
+        <p>悠然见南山。</p>  
+        <p>山气日夕佳，</p>  
+        <p>飞鸟相与还。</p>  
+        <p>此中有真意，</p>  
+        <p>欲辨已忘言。</p>  
+    </div>  
+</body>  
+</html>
