@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>薪资实时计算器|日薪计算|时薪计算|实时计算</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(45deg, #ff3b3b 0%, #ff6b6b 100%);
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            background: linear-gradient(45deg, #ffd700 0%, #ffec8b 100%);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(255, 59, 59, 0.3);
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            color: #c00;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #c00;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 1rem;
+            border: 3px solid #ff3b3b;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #ff6b6b;
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+        }
+
+        button {
+            width: 100%;
+            padding: 1.2rem;
+            background: #ff3b3b;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        button:hover {
+            background: #ff1a1a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 59, 59, 0.5);
+        }
+
+        .results {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(255, 59, 59, 0.2);
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: linear-gradient(45deg, #fff5ee 0%, #ffe4e1 100%);
+            border-radius: 10px;
+            border: 2px solid #ffcccc;
+        }
+
+        .result-value {
+            font-family: 'Courier New', monospace;
+            color: #c00;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .highlight {
+            background: linear-gradient(45deg, #fff0f5 0%, #ffe4e1 100%);
+            border: 2px solid #ff3b3b;
+            transform: scale(1.02);
+        }
+
+        .unit {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            margin-left: 0.3rem;
+        }
+
+        .gold-border {
+            position: absolute;
+            background: linear-gradient(45deg, #ffd700, #ffec8b, #ffd700);
+            width: 100%;
+            height: 8px;
+            left: 0;
+        }
+
+        .gold-border.top {
+            top: 0;
+        }
+
+        .gold-border.bottom {
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="gold-border top"></div>
+        <h1>💰 薪资实时计算器</h1>
+        
+        <div id="inputSection">
+            <div class="input-group">
+                <label>月薪（元）</label>
+                <input type="number" id="salary" step="100" placeholder="输入你的月薪">
+            </div>
+
+            <div class="input-group">
+                <label>每月工作天数</label>
+                <input type="number" id="workDays" placeholder="输入工作天数">
+            </div>
+
+            <div class="input-group">
+                <label>每天工作小时</label>
+                <input type="number" id="dailyHours" placeholder="输入每日工作时长">
+            </div>
+        </div>
+
+        <div class="results" id="results">
+            <div class="result-item">
+                <span>已工作时间：</span>
+                <span class="result-value" id="timeElapsed">0 时 0 分 0 秒</span>
+            </div>
+            <div class="result-item highlight">
+                <span>已赚金额：</span>
+                <span class="result-value">¥<span id="earned">0.0000</span></span>
+            </div>
+            <div class="result-item">
+                <span>收入速率：</span>
+                <div>
+                    <div class="result-value">¥<span id="daily">0.0000</span><span class="unit">/天</span></div>
+                    <div class="result-value">¥<span id="hourly">0.0000</span><span class="unit">/小时</span></div>
+                    <div class="result-value">¥<span id="minutely">0.0000</span><span class="unit">/分钟</span></div>
+                    <div class="result-value">¥<span id="secondly">0.0000</span><span class="unit">/秒</span></div>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="toggleView()" id="actionButton">开始计算</button>
+        <div class="gold-border bottom"></div>
+    </div>
+
+    <script>
+        let startTime;
+        let hourlyRate;
+        let interval;
+
+        function toggleView() {
+            const btn = document.getElementById('actionButton');
+            if (btn.textContent === "开始计算") {
+                startCalculation();
+                document.getElementById('inputSection').style.display = 'none';
+                document.getElementById('results').style.display = 'block';
+                btn.textContent = "返回修改";
+            } else {
+                clearInterval(interval);
+                document.getElementById('inputSection').style.display = 'block';
+                document.getElementById('results').style.display = 'none';
+                btn.textContent = "开始计算";
+            }
+        }
+
+        function startCalculation() {
+            const salary = parseFloat(document.getElementById('salary').value);
+            const workDays = parseFloat(document.getElementById('workDays').value);
+            const dailyHours = parseFloat(document.getElementById('dailyHours').value);
+
+            if (!salary || !workDays || !dailyHours) {
+                alert('请完整填写所有字段');
+                return;
+            }
+
+            const dailyRate = salary / workDays;
+            hourlyRate = dailyRate / dailyHours;
+            
+            startTime = new Date();
+            
+            // 更新速率显示
+            document.getElementById('daily').textContent = dailyRate.toFixed(4);
+            document.getElementById('hourly').textContent = hourlyRate.toFixed(4);
+            document.getElementById('minutely').textContent = (hourlyRate / 60).toFixed(4);
+            document.getElementById('secondly').textContent = (hourlyRate / 3600).toFixed(4);
+
+            if (interval) clearInterval(interval);
+            interval = setInterval(updateEarnings, 100);
+        }
+
+        function updateEarnings() {
+            const currentTime = new Date();
+            const secondsElapsed = (currentTime - startTime) / 1000;
+            
+            const hours = Math.floor(secondsElapsed / 3600);
+            const minutes = Math.floor((secondsElapsed % 3600) / 60);
+            const seconds = Math.floor(secondsElapsed % 60);
+
+            document.getElementById('timeElapsed').textContent = 
+                `${hours} 时 ${minutes} 分 ${seconds} 秒`;
+
+            const earned = (hourlyRate * secondsElapsed) / 3600;
+            document.getElementById('earned').textContent = earned.toFixed(4);
+        }
+    </script>
+</body>
+</html>
