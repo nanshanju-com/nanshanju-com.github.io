@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>时间计算器</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    .calculator {
+      width: 320px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #333;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+    .display {
+      background: #222;
+      color: #fff;
+      padding: 20px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      text-align: right;
+      font-family: monospace;
+    }
+    .current-input {
+      font-size: 24px;
+      min-height: 30px;
+    }
+    .result {
+      color: #888;
+      font-size: 16px;
+      min-height: 24px;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+    }
+    button {
+      padding: 15px;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      cursor: pointer;
+      background: #444;
+      color: white;
+    }
+    button:active {
+      filter: brightness(1.2);
+    }
+    .operator {
+      background: #f90;
+    }
+    .equals {
+      background: #09f;
+    }
+    .error {
+      color: #f00;
+      text-align: center;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="calculator">
+      <div class="display">
+        <div class="current-input">{{ currentInput || '0' }}</div>
+        <div class="result">{{ displayResult }}</div>
+      </div>
+      
+      <div v-if="error" class="error">{{ error }}</div>
+      
+      <div class="buttons">
+        <button @click="clear">C</button>
+        <button @click="addTime('+')" class="operator">+</button>
+        <button @click="addTime('-')" class="operator">-</button>
+        <button @click="appendColon">:</button>
+        
+        <button @click="appendNumber(7)">7</button>
+        <button @click="appendNumber(8)">8</button>
+        <button @click="appendNumber(9)">9</button>
+        <button @click="appendDot">.</button>
+        
+        <button @click="appendNumber(4)">4</button>
+        <button @click="appendNumber(5)">5</button>
+        <button @click="appendNumber(6)">6</button>
+        <button @click="calculate" class="equals">=</button>
+        
+        <button @click="appendNumber(1)">1</button>
+        <button @click="appendNumber(2)">2</button>
+        <button @click="appendNumber(3)">3</button>
+        <button @click="appendNumber(0)">0</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const app = Vue.createApp({
+      data() {
+        return {
+          currentInput: '',
+          accumulatedMinutes: 0,
+          operator: '+',
+          error: ''
+        }
+      },
+      computed: {
+        displayResult() {
+          return this.formatResult(this.accumulatedMinutes)
+        }
+      },
+      methods: {
+        // 输入数字
+        appendNumber(num) {
+          if (this.error) this.error = ''
+          
+          // 限制小时部分最多2位
+          if (this.isHourPart() && this.currentHourPart().length >= 2) return
+          
+          // 限制分钟部分最多2位
+          if (this.isMinutePart() && this.currentMinutePart().length >= 2) return
+          
+          this.currentInput += num.toString()
+        },
+        
+        // 添加小数点
+        appendDot() {
+          if (!this.currentInput.includes('.') && !this.currentInput.includes(':')) {
+            this.currentInput += '.'
+          }
+        },
+        
+        // 添加冒号
+        appendColon() {
+          if (!this.currentInput.includes(':') && !this.currentInput.includes('.')) {
+            this.currentInput += ':'
+          }
+        },
+        
+        // 执行计算
+        addTime(op) {
+          try {
+            const minutes = this.parseCurrentInput()
+            this.executeOperation(minutes)
+            this.operator = op
+            this.currentInput = ''
+          } catch (e) {
+            this.error = e.message
+          }
+        },
+        
+        // 执行等于计算
+        calculate() {
+          try {
+            const minutes = this.parseCurrentInput()
+            this.executeOperation(minutes)
+            this.operator = '+'
+            this.currentInput = ''
+          } catch (e) {
+            this.error = e.message
+          }
+        },
+        
+        // 执行运算符逻辑
+        executeOperation(minutes) {
+          if (this.operator === '+') {
+            this.accumulatedMinutes += minutes
+          } else {
+            this.accumulatedMinutes -= minutes
+          }
+        },
+        
+        // 解析当前输入为分钟数
+        parseCurrentInput() {
+          if (!this.currentInput) return 0
+          
+          // 验证格式
+          if (!/^(\d+)([:.]\d+)?$/.test(this.currentInput)) {
+            throw new Error('无效格式！使用：2.5 或 2:30')
+          }
+          
+          // 分解小时和分钟
+          const [hoursPart, minutesPart] = this.currentInput.split(/[:.]/)
+          const hours = parseInt(hoursPart || 0)
+          let minutes = 0
+          
+          if (minutesPart) {
+            if (this.currentInput.includes(':')) {
+              // 冒号格式
+              minutes = parseInt(minutesPart.padEnd(2, '0').substring(0, 2))
+            } else {
+              // 小数点格式
+              minutes = Math.round(parseFloat('0.' + minutesPart) * 60)
+            }
+          }
+          
+          if (hours > 24 || minutes >= 60) {
+            throw new Error('时间超出合理范围')
+          }
+          
+          return hours * 60 + minutes
+        },
+        
+        // 格式转换
+        formatResult(totalMinutes) {
+          const hours = Math.floor(Math.abs(totalMinutes) / 60)
+          const minutes = Math.abs(totalMinutes) % 60
+          const sign = totalMinutes < 0 ? '-' : ''
+          
+          return `${sign}${hours}:${minutes.toString().padStart(2, '0')} (${sign}${hours}.${Math.round(minutes/6)/10})`
+        },
+        
+        // 清空
+        clear() {
+          this.currentInput = ''
+          this.accumulatedMinutes = 0
+          this.operator = '+'
+          this.error = ''
+        },
+        
+        // 辅助方法
+        isHourPart() {
+          return !this.currentInput.includes(':') && !this.currentInput.includes('.')
+        },
+        
+        isMinutePart() {
+          return /[:.]/.test(this.currentInput)
+        },
+        
+        currentHourPart() {
+          return this.currentInput.split(/[:.]/)[0] || ''
+        },
+        
+        currentMinutePart() {
+          const parts = this.currentInput.split(/[:.]/)
+          return parts.length > 1 ? parts[1] : ''
+        }
+      }
+    })
+
+    app.mount('#app')
+  </script>
+</body>
+</html>
