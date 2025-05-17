@@ -21,13 +21,13 @@
       font-family: monospace;
     }
     .current-input {
-      font-size: 24px;
-      min-height: 30px;
+	  color: #888;
+      font-size: 30px;
+      min-height: 60px;
     }
     .result {
-      color: #888;
-      font-size: 16px;
-      min-height: 24px;
+      font-size: 60px;
+      min-height: 80px;
     }
     .buttons {
       display: grid;
@@ -83,12 +83,17 @@
         <button @click="appendNumber(4)">4</button>
         <button @click="appendNumber(5)">5</button>
         <button @click="appendNumber(6)">6</button>
-        <button @click="calculate" class="equals">=</button>
+        <button @click="addTime('-')" class="operator">-</button>
         
         <button @click="appendNumber(1)">1</button>
         <button @click="appendNumber(2)">2</button>
         <button @click="appendNumber(3)">3</button>
-        <button @click="appendNumber(0)">0</button>
+        <button @click="addTime('+')" class="operator">+</button>
+		
+		<button @click="appendColon">:</button>
+		<button @click="appendNumber(0)">0</button>
+		<button @click="appendDot">.</button>
+		<button @click="calculate" class="equals">=</button>
       </div>
     </div>
   </div>
@@ -206,7 +211,7 @@
           const minutes = Math.abs(totalMinutes) % 60
           const sign = totalMinutes < 0 ? '-' : ''
           
-          return `${sign}${hours}:${minutes.toString().padStart(2, '0')} (${sign}${hours}.${Math.round(minutes/6)/10})`
+          return `${sign}${hours}:${minutes.toString().padStart(2, '0')} (${sign}${hours}.${(minutes/60).toFixed(4)*10000})`
         },
         
         // 清空
