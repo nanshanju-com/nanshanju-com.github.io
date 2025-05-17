@@ -71,14 +71,14 @@
       
       <div class="buttons">
         <button @click="clear">C</button>
-        <button @click="addTime('+')" class="operator">+</button>
-        <button @click="addTime('-')" class="operator">-</button>
-        <button @click="appendColon">:</button>
+        <button @click="appendZeroColon">0:</button>
+        <button @click="addTime('/')">÷</button>
+        <button @click="deleteLast" >⌫</button>
         
         <button @click="appendNumber(7)">7</button>
         <button @click="appendNumber(8)">8</button>
         <button @click="appendNumber(9)">9</button>
-        <button @click="appendDot">.</button>
+        <button @click="addTime('*')" class="operator">×</button>
         
         <button @click="appendNumber(4)">4</button>
         <button @click="appendNumber(5)">5</button>
@@ -89,11 +89,11 @@
         <button @click="appendNumber(2)">2</button>
         <button @click="appendNumber(3)">3</button>
         <button @click="addTime('+')" class="operator">+</button>
-		
-		<button @click="appendColon">:</button>
-		<button @click="appendNumber(0)">0</button>
-		<button @click="appendDot">.</button>
-		<button @click="calculate" class="equals">=</button>
+        
+        <button @click="appendDot">.</button>
+        <button @click="appendNumber(0)">0</button>
+        <button @click="appendColon">:</button>
+        <button @click="calculate" class="equals">=</button>
       </div>
     </div>
   </div>
@@ -140,6 +140,18 @@
             this.currentInput += ':'
           }
         },
+        // 快速输入0:
+        appendZeroColon() {
+          if (!this.currentInput) {
+            this.currentInput = '0:'
+          }
+        },
+       // 回退已输入的单个字符
+       deleteLast() {
+          if (this.currentInput.length > 0) {
+           this.currentInput = this.currentInput.slice(0, -1)
+         }
+       },
         
         // 执行计算
         addTime(op) {
@@ -167,10 +179,19 @@
         
         // 执行运算符逻辑
         executeOperation(minutes) {
-          if (this.operator === '+') {
-            this.accumulatedMinutes += minutes
-          } else {
-            this.accumulatedMinutes -= minutes
+          switch(this.operator) {
+            case '+':
+              this.accumulatedMinutes += minutes
+              break
+            case '-':
+              this.accumulatedMinutes -= minutes
+              break
+            case '*':
+              this.accumulatedMinutes *= (minutes / 60)  // 按小时数乘法
+              break
+            case '/':
+              this.accumulatedMinutes /= (minutes / 60)  // 按小时数除法
+              break
           }
         },
         
@@ -198,7 +219,7 @@
             }
           }
           
-          if (hours > 24 || minutes >= 60) {
+          if (hours > 24) {
             throw new Error('时间超出合理范围')
           }
           
@@ -209,9 +230,10 @@
         formatResult(totalMinutes) {
           const hours = Math.floor(Math.abs(totalMinutes) / 60)
           const minutes = Math.abs(totalMinutes) % 60
+          console.log('minutes: ' + minutes)
           const sign = totalMinutes < 0 ? '-' : ''
           
-          return `${sign}${hours}:${minutes.toString().padStart(2, '0')} (${sign}${hours}.${(minutes/60).toFixed(4)*10000})`
+          return `${sign}${hours}:${minutes.toString().padStart(2, '0')} (${sign}${hours}.${Math.round((minutes/60).toFixed(4)*10000)})`
         },
         
         // 清空
