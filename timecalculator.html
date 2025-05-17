@@ -4,6 +4,19 @@
   <title>时间计算器</title>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <style>
+    .result {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .time-format {
+      font-size: 40px;
+      line-height: 1.2;
+    }
+    .decimal-format {
+      font-size: 30px;
+      line-height: 1.2;
+    }
     .calculator {
       margin: 20px auto;
       padding: 20px;
@@ -64,7 +77,11 @@
     <div class="calculator">
       <div class="display">
         <div class="current-input">{{ currentInput || '0' }}</div>
-        <div class="result">{{ displayResult }}</div>
+        <div class="result">
+          <div class="time-format">{{ timeFormat }}</div>
+          <div class="decimal-format">{{ decimalFormat }}</div>
+        </div>
+
       </div>
       
       <div v-if="error" class="error">{{ error }}</div>
@@ -111,7 +128,21 @@
       computed: {
         displayResult() {
           return this.formatResult(this.accumulatedMinutes)
-        }
+        },
+        // 拆分为两个计算属性
+        timeFormat() {
+          const total = this.accumulatedMinutes
+          const absTotal = Math.abs(total)
+          const hours = Math.floor(absTotal / 60)
+          const minutes = absTotal % 60
+          const sign = total < 0 ? '-' : ''
+          return `${sign}${hours}小时${minutes.toString().padStart(2, '0')}分`
+        },
+        decimalFormat() {
+          const total = this.accumulatedMinutes
+          const decimal = total / 60
+          return decimal.toFixed(2) // 直接保留两位小数
+        }        
       },
       methods: {
         // 输入数字
